@@ -8,7 +8,7 @@ var products = [
 	{id : 6, name : 'Pen', cost : 60, units : 50, category : 'stationary'},
 	{id : 3, name : 'Pencil', cost : 20, units : 30, category : 'stationary'},
 	{id : 9, name : 'Len', cost : 70, units : 80, category : 'grocery'},
-	{id : 5, name : 'Ten', cost : 50, units : 60, category : 'grocery'},
+	{id : 5, name : 'Ten', cost : 50, units : 60, category : 'utility'},
 	{id : 7, name : 'Den', cost : 90, units : 40, category : 'stationary'},
 ];
 
@@ -161,7 +161,7 @@ describe('Filtering', function(){
 				return !understockedProductCriteria(product);
 			};*/
 			var overstockedProductCriteria = negate(understockedProductCriteria);
-			
+
 			describe('All understocked products [units <= 40 ]', function(){
 				var understockedProducts = filter(products, understockedProductCriteria);
 				console.table(understockedProducts);
@@ -171,5 +171,39 @@ describe('Filtering', function(){
 				console.table(overstockedProducts);
 			});
 		});
+	});
+});
+
+describe('GroupBy', function(){
+	function groupBy(list, keySelector){
+		var result = {};
+		for(var index=0; index < list.length; index++){
+			var key = keySelector(list[index]);
+			if (typeof result[key] === 'undefined')
+				result[key] = [];
+			result[key].push(list[index]);
+		}
+		return result;
+	}
+	function describeGroup(groupedObj){
+		for(var key in groupedObj){
+			describe('Key - [' + key + ']', function(){
+				console.table(groupedObj[key]);
+			});
+		}
+	}
+	describe('Products by category', function(){
+		var categoryKeySelector = function(product){
+			return product.category;
+		};
+		var productsByCategory = groupBy(products, categoryKeySelector);
+		describeGroup(productsByCategory);
+	});
+	describe('Products by cost', function(){
+		var costKeySelector = function(product){
+			return product.cost > 50 ? 'costly' : 'affordable';
+		};
+		var productsByCost = groupBy(products, costKeySelector);
+		describeGroup(productsByCost);
 	});
 });
