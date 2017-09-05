@@ -107,16 +107,69 @@ describe('Sorting', function(){
 	})
 });
 
-/*describe('Filtering', function(){
+describe('Filtering', function(){
 	describe('Default filter [ all stationary products ]', function(){
-		//filter()
-		console.table(products);
+		function filterStationaryProducts(){
+			var stationaryProducts = [];
+			for(var index=0; index < products.length; index++)
+				if (products[index].category === 'stationary')
+					stationaryProducts.push(products[index]);
+			return stationaryProducts;
+		}
+		var stationaryProducts = filterStationaryProducts();
+		console.table(stationaryProducts);
 	});
 
 	describe('Any list by any criteria', function(){
-		describe('All costly products [cost > 50]', function(){
-			//filter();
-			console.table(products);
+		function filter(list, criteriaFn){
+			var result = [];
+			for(var index=0; index < list.length; index++)
+				if (criteriaFn(list[index]))
+					result.push(list[index]);
+			return result;
+		}
+		function negate(criteriaFn){
+			return function(){
+				return !criteriaFn.apply(this, arguments);
+			}
+		}
+		describe('Products by cost', function(){
+			var costlyProductCriteria = function(product){
+				return product.cost > 50;
+			};
+			/*var affordableProductCritera = function(product){
+				//return product.cost <= 50;
+				return !costlyProductCriteria(product);
+			}*/
+			var affordableProductCritera = negate(costlyProductCriteria);
+
+			describe('All costly products [cost > 50]', function(){
+				var costlyProducts = filter(products, costlyProductCriteria);
+				console.table(costlyProducts);
+			});
+			describe("All affordable products [cost <= 50]", function(){
+				var affordableProducts = filter(products, affordableProductCritera);
+				console.table(affordableProducts);
+			});
+		});
+
+		describe('Products by units', function(){
+			var understockedProductCriteria = function(product){
+				return product.units <= 40;
+			};
+			/*var overstockedProductCriteria = function(product){
+				return !understockedProductCriteria(product);
+			};*/
+			var overstockedProductCriteria = negate(understockedProductCriteria);
+			
+			describe('All understocked products [units <= 40 ]', function(){
+				var understockedProducts = filter(products, understockedProductCriteria);
+				console.table(understockedProducts);
+			});
+			describe('All overstocked products [!understocked]', function(){
+				var overstockedProducts = filter(products, overstockedProductCriteria);
+				console.table(overstockedProducts);
+			});
 		});
 	});
-});*/
+});
